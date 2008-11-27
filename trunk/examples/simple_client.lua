@@ -1,5 +1,9 @@
 #!/usr/bin/lua
 
+--
+-- usage: simple_client.lua <file.torrent> 
+--
+
 require('luatorrent')
 
 -- load torrent info from first argument

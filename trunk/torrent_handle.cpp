@@ -49,6 +49,12 @@ extern "C" {
 using namespace libtorrent;
 using namespace boost::filesystem;
 
+/*
+ * status_table = handle:status()
+ *
+ *  return a table of status information
+ *  about this torrent
+ */
 static int torrent_handle_status(lua_State *L) {
     void* ud = 0;
 
@@ -102,6 +108,12 @@ static int torrent_handle_status(lua_State *L) {
     return 1;
 }
 
+/*
+ * bool = handle:is_seed()
+ *
+ *  return true if this torrent is a seed (i.e. has finished downloading)
+ *  otherwise false
+ */
 static int torrent_handle_is_seed(lua_State *L) {
     void* ud = 0;
 
@@ -113,6 +125,12 @@ static int torrent_handle_is_seed(lua_State *L) {
     return 1;
 }
 
+/*
+ * bool = handle:is_paused()
+ *
+ *  returns true if this torrent is paused
+ *  otherwise false
+ */
 static int torrent_handle_is_paused(lua_State *L) {
     void* ud = 0;
 
@@ -124,6 +142,11 @@ static int torrent_handle_is_paused(lua_State *L) {
     return 1;
 }
 
+/*
+ * handle:pause()
+ *
+ *  unconditionally pauses this torrent
+ */
 static int torrent_handle_pause(lua_State *L) {
     void* ud = 0;
 
@@ -135,6 +158,12 @@ static int torrent_handle_pause(lua_State *L) {
     return 0;
 }
 
+/*
+ * handle:resume()
+ *
+ *  unconditionally resumes (unpauses) this torrent.
+ *  the opposite of handle:pause()
+ */
 static int torrent_handle_resume(lua_State *L) {
     void* ud = 0;
 
@@ -146,6 +175,11 @@ static int torrent_handle_resume(lua_State *L) {
     return 0;
 }
 
+/*
+ * handle:force_reannounce()
+ *
+ *  forces this torrent to do another tracker request to receive new peers
+ */
 static int torrent_handle_force_reannounce(lua_State *L) {
     void* ud = 0;
 
@@ -156,6 +190,11 @@ static int torrent_handle_force_reannounce(lua_State *L) {
 
     return 0;
 }
+
+/*
+ * str = handle:name()
+ *  returns the name of this torrent
+ */
 static int torrent_handle_name(lua_State *L) {
     void* ud = 0;
 
@@ -167,32 +206,47 @@ static int torrent_handle_name(lua_State *L) {
     return 1;
 }
 
+/*
+ * handle:set_upload_limit(bytes_per_second)
+ *
+ *  limit the upload bandwidth used by this torrent to bytes_per_second
+ */
 static int torrent_handle_set_upload_limit(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Handle");
     torrent_handle *h = *((torrent_handle **)ud);
 
-    int limit = (int)lua_tonumber(L, 2);
+    int limit = luaL_checkint(L, 2);
 
     h->set_upload_limit(limit);
 
     return 0;
 }
 
+/*
+ * handle:set_download_limit(bytes_per_second)
+ *
+ *  limit the download bandwidth used by this torrent to bytes_per_second
+ */
 static int torrent_handle_set_download_limit(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Handle");
     torrent_handle *h = *((torrent_handle **)ud);
 
-    int limit = (int)lua_tonumber(L, 2);
+    int limit = luaL_checkint(L, 2);
 
     h->set_download_limit(limit);
 
     return 0;
 }
 
+/*
+ * handle:set_sequenced_download_threshold(int)
+ *
+ *  missing from libtorrent docs, deprecated?
+ */
 static int torrent_handle_set_sequenced_download_threshold(lua_State *L) {
     void* ud = 0;
 
@@ -206,6 +260,11 @@ static int torrent_handle_set_sequenced_download_threshold(lua_State *L) {
     return 0;
 }
 
+/*
+ * handle:set_ratio(ratio)
+ *
+ *  sets the desired download / upload ratio. If set to 0, it is considered being infinite
+ */
 static int torrent_handle_set_ratio(lua_State *L) {
     void* ud = 0;
 
@@ -219,6 +278,11 @@ static int torrent_handle_set_ratio(lua_State *L) {
     return 0;
 }
 
+/*
+ * path_str = handle:save_path()
+ *
+ *  returns the save path of this torrent
+ */
 static int torrent_handle_save_path(lua_State *L) {
     void* ud = 0;
 
@@ -232,26 +296,41 @@ static int torrent_handle_save_path(lua_State *L) {
     return 1;
 }
 
+/*
+ * handle:set_max_uploads(max_upload_peers)
+ *
+ *  sets the maximum number of peers unchoked at the same time on this torrent. 
+ *  If you set this to -1, there will be no limit.
+ */
 static int torrent_handle_set_max_uploads(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Handle");
     torrent_handle *h = *((torrent_handle **)ud);
 
-    int max_uploads = (int)lua_tonumber(L, 2);
+    int max_uploads = luaL_checkint(L, 2);
 
     h->set_max_uploads(max_uploads);
 
     return 0;
 }
 
+/*
+ * handle:set_max_connections(max_connections)
+ *
+ *  sets the maximum number of connection this torrent will open. 
+ *  If all connections are used up, incoming connections may be refused 
+ *  or poor connections may be closed. This must be at least 2. 
+ *  The default is unlimited number of connections. 
+ *  If -1 is given to the function, it means unlimited.
+ */
 static int torrent_handle_set_max_connections(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Handle");
     torrent_handle *h = *((torrent_handle **)ud);
 
-    int max_connections = (int)lua_tonumber(L, 2);
+    int max_connections = luaL_checkint(L, 2);
 
     h->set_max_connections(max_connections);
 
@@ -259,6 +338,12 @@ static int torrent_handle_set_max_connections(lua_State *L) {
     return 0;
 }
 
+/*
+ * handle:set_tracker_login(username, password)
+ *
+ *  sets a username and password that will be sent along in 
+ *  the HTTP-request of the tracker announce.
+ */
 static int torrent_handle_set_tracker_login(lua_State *L) {
     void* ud = 0;
 
@@ -273,6 +358,11 @@ static int torrent_handle_set_tracker_login(lua_State *L) {
     return 0;
 }
 
+/*
+ * bool = handle:has_metadata()
+ *
+ *  returns true if this torrent has metadata
+ */
 static int torrent_handle_has_metadata(lua_State *L) {
     void* ud = 0;
 
@@ -284,6 +374,11 @@ static int torrent_handle_has_metadata(lua_State *L) {
     return 1;
 }
 
+/*
+ * info = handle:get_torrent_info()
+ *
+ *  returns the torrent_info object associated with this torrent
+ */
 static int torrent_handle_get_torrent_info(lua_State *L) {
     void* ud = 0;
 
@@ -301,6 +396,12 @@ static int torrent_handle_get_torrent_info(lua_State *L) {
     return 1;
 }
 
+/*
+ * bool = handle:is_valid()
+ *
+ *  returns true if this handle refers to a valid torrent, 
+ *  or false if it hasn't been initialized or if the torrent it refers to has been aborted.
+ */
 static int torrent_handle_is_valid(lua_State *L) {
     void* ud = 0;
 
@@ -312,6 +413,12 @@ static int torrent_handle_is_valid(lua_State *L) {
     return 1;
 }
 
+/*
+ * files = handle:file_progress()
+ *
+ *  returns a numerically indexed table with the the number of 
+ *  bytes downloaded of each file in this torrent.
+ */
 static int torrent_handle_file_progress(lua_State *L) {
     void* ud = 0;
 
@@ -331,6 +438,12 @@ static int torrent_handle_file_progress(lua_State *L) {
     return 1;
 }
 
+/*
+ * peers = handle:get_peer_info()
+ *
+ *  returns a numerically indexed table with peer information
+ *  for each peer connected to this torrent
+ */
 static int torrent_handle_get_peer_info(lua_State *L) {
     void* ud = 0;
 
@@ -394,6 +507,14 @@ static int torrent_handle_get_peer_info(lua_State *L) {
     return 1;
 }
 
+/*
+ * queue = handle:get_download_queue()
+ *
+ *  returns a numerically indexed table with information about pieces 
+ *  that are partially downloaded or not downloaded at all but partially requested
+ *
+ *  Not currently implemented
+ */
 static int torrent_handle_get_download_queue(lua_State *L) {
     void* ud = 0;
 
@@ -406,6 +527,11 @@ static int torrent_handle_get_download_queue(lua_State *L) {
     return 1;
 }
 
+/*
+ * handle:move_storage(newpath)
+ *
+ *  moves the file(s) that this torrent are currently seeding from or downloading to.
+ */
 static int torrent_handle_move_storage(lua_State *L) {
     void* ud = 0;
 
@@ -419,6 +545,11 @@ static int torrent_handle_move_storage(lua_State *L) {
     return 0;
 }
 
+/*
+ * bytes_per_second = handle:upload_limit()
+ *
+ *  returns the current limit setting for upload
+ */
 static int torrent_handle_upload_limit(lua_State *L) {
     void* ud = 0;
 
@@ -429,7 +560,11 @@ static int torrent_handle_upload_limit(lua_State *L) {
     return 1;
 }
 
-
+/*
+ * bytes_per_second = handle:download_limit()
+ *
+ *  returns the current limit setting for download
+ */
 static int torrent_handle_download_limit(lua_State *L) {
     void* ud = 0;
 
@@ -439,6 +574,14 @@ static int torrent_handle_download_limit(lua_State *L) {
     lua_pushinteger(L, h->download_limit());
     return 1;
 }
+
+/*
+ * priority = handle:piece_priority(piece_index)
+ *  OR
+ * handle:piece_priority(piece_index, priority)
+ *
+ * gets or sets the piece priority
+ */
 
 static int torrent_handle_piece_priority(lua_State *L) {
     int n = lua_gettop(L);
@@ -460,6 +603,12 @@ static int torrent_handle_piece_priority(lua_State *L) {
     return n == 3 ? 0 : 1;
 }
 
+/*
+ * handle:prioritize_pieces(pieces)
+ *
+ *  takes a table of integers, one integer per piece in the torrent. 
+ *  All the piece priorities will be updated with the priorities in the vector.
+ */
 static int torrent_handle_prioritize_pieces(lua_State *L) {
     void* ud = 0;
 
@@ -482,6 +631,12 @@ static int torrent_handle_prioritize_pieces(lua_State *L) {
     return 0;
 }
 
+/*
+ * pieces = handle:piece_priorities()
+ *
+ *  returns a table with one element for each piece in the torrent. 
+ *  Each element is the current priority of that piece.
+ */
 static int torrent_handle_piece_priorities(lua_State *L) {
     void* ud = 0;
 
@@ -499,6 +654,12 @@ static int torrent_handle_piece_priorities(lua_State *L) {
     return 1;
 }
 
+/*
+ * handle:prioritize_files(files)
+ *
+ *  takes a table that has at as many elements as there are 
+ *  files in the torrent. Each entry is the priority of that file.
+ */
 static int torrent_handle_prioritize_files(lua_State *L) {
     void* ud = 0;
 
@@ -521,6 +682,11 @@ static int torrent_handle_prioritize_files(lua_State *L) {
     return 0;
 }
 
+/* 
+ * handle:scrape_tracker()
+ *
+ *  send a scrape request to the tracker
+ */
 static int torrent_handle_scrape_tracker(lua_State *L) {
     void* ud = 0;
 
@@ -532,6 +698,11 @@ static int torrent_handle_scrape_tracker(lua_State *L) {
     return 0;
 }
 
+/*
+ * handle:use_interface(interface_name)
+ *
+ *  sets the network interface this torrent will use when it opens outgoing connections
+ */
 static int torrent_handle_use_interface(lua_State *L) {
     void* ud = 0;
 
@@ -543,6 +714,11 @@ static int torrent_handle_use_interface(lua_State *L) {
     return 0;
 }
 
+/*
+ * handle:write_resume_data(filepath)
+ *
+ *  writes resume data to the file named filepath
+ */
 static int torrent_handle_write_resume_data(lua_State *L) {
     void* ud = 0;
 
@@ -559,6 +735,9 @@ static int torrent_handle_write_resume_data(lua_State *L) {
     return 0;
 }
 
+/*
+ * __gc
+ */
 static int torrent_handle_gc(lua_State *L) {
     void* ud = 0;
 
@@ -599,6 +778,9 @@ static const luaL_Reg torrent_handle_methods[] = {
 
     {"scrape_tracker", torrent_handle_scrape_tracker},
     
+    /*
+     * TODO implement these functions
+     */
 //  resolve_countries
 //  trackers
 //  replace_trackers

@@ -46,6 +46,12 @@ int torrent_info_register(lua_State *L);
 int torrent_session_register(lua_State *L);
 int torrent_handle_register(lua_State *L);
 
+/*
+ *
+ * library entry point
+ *
+ */
+
 extern "C" {
 
 LT_EXPORT int luaopen_luatorrent(lua_State *L) {
