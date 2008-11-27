@@ -1,5 +1,9 @@
 #!/usr/bin/lua
 
+--
+-- usage: dump_torrent.lua <file.torrent> 
+--
+
 require('luatorrent')
 
 -- load torrent file from command line

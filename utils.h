@@ -20,52 +20,74 @@
  * IN THE SOFTWARE.
  */
 
+/*
+ *
+ * Table construction helper functions
+ *
+ * LUA_PUSH_ATTRIB_* creates string indexed (hashmap)
+ * LUA_PUSH_ATTRIB_* creates integer indexed (array)
+ *
+ */
+
+/*
+ *
+ * Table construction helper functions
+ *
+ * LUA_PUSH_ATTRIB_* creates string indexed (hashmap)
+ * LUA_PUSH_ATTRIB_* creates integer indexed (array)
+ *
+ */
 
 #define LUA_PUSH_ATTRIB_INT(n, v) \
     lua_pushstring(L, n); \
     lua_pushinteger(L, v); \
-    lua_settable(L, -3); 
+    lua_rawset(L, -3); 
 
 #define LUA_PUSH_ATTRIB_FLOAT(n, v) \
     lua_pushstring(L, n); \
     lua_pushnumber(L, v); \
-    lua_settable(L, -3); 
+    lua_rawset(L, -3); 
 
 #define LUA_PUSH_ATTRIB_STRING(n, v) \
     lua_pushstring(L, n); \
     lua_pushstring(L, v); \
-    lua_settable(L, -3); 
+    lua_rawset(L, -3); 
 
 #define LUA_PUSH_ATTRIB_BOOL(n, v) \
     lua_pushstring(L, n); \
     lua_pushboolean(L, v); \
-    lua_settable(L, -3); 
+    lua_rawset(L, -3); 
 
+#define LUA_PUSH_ATTRIB_NIL(n) \
+    lua_pushstring(L, n); \
+    lua_pushnil(L); \
+    lua_rawset(L, -3); 
 
 
 
 #define LUA_PUSH_ARRAY_INT(n, v) \
-    lua_pushinteger(L, n); \
     lua_pushinteger(L, v); \
-    lua_settable(L, -3); \
+    lua_rawseti(L, -2, n); \
     n++; 
 
 #define LUA_PUSH_ARRAY_FLOAT(n, v) \
-    lua_pushinteger(L, n); \
     lua_pushnumber(L, v); \
-    lua_settable(L, -3); \
+    lua_rawseti(L, -2, n); \
     n++; 
 
 #define LUA_PUSH_ARRAY_STRING(n, v) \
-    lua_pushinteger(L, n); \
     lua_pushstring(L, v); \
-    lua_settable(L, -3); \
+    lua_rawseti(L, -2, n); \
     n++;
 
 #define LUA_PUSH_ARRAY_BOOL(n, v) \
-    lua_pushinteger(L, n); \
     lua_pushboolean(L, v); \
-    lua_settable(L, -3); \
+    lua_rawseti(L, -2, n); \
+    n++;
+
+#define LUA_PUSH_ARRAY_NIL(n) \
+    lua_pushnil(L); \
+    lua_rawseti(L, -2, n); \
     n++;
 
 
