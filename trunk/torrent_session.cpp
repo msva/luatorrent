@@ -45,6 +45,12 @@ extern "C" {
 
 using namespace libtorrent;
 
+/*
+ * session = Torrent.Session.New([first_port, last_port])
+ *
+ *   creates a new session object on the first available port between
+ *   first_port and last_port inclusive
+ */
 static int torrent_session_new(lua_State *L) {
     int n = lua_gettop(L);
 
@@ -69,6 +75,11 @@ static int torrent_session_new(lua_State *L) {
     return 1;
 }
 
+/*
+ * session:abort()
+ *
+ *   destruct the session asynchronously
+ */
 static int torrent_session_abort(lua_State *L) {
     void* ud = 0;
 
@@ -80,6 +91,12 @@ static int torrent_session_abort(lua_State *L) {
     return 0;
 }
 
+/*
+ * torrent_handle = session:add_torrent(torrent_info, [save_path, resume_data_file])
+ *
+ *   adds the torrent described by torrent_info to this session, to the save_path (default cwd)
+ *   with fast resume file resume_data_file  
+ */
 static int torrent_session_add_torrent(lua_State *L) {
     int n = lua_gettop(L);
     void* ud = 0;
@@ -131,6 +148,11 @@ static int torrent_session_add_torrent(lua_State *L) {
     return 1;
 }
 
+/*
+ * handles = session:torrent_handles()
+ *
+ *   returns an tables of handles associated with this session
+ */
 static int torrent_session_torrent_handles(lua_State *L) {
     void* ud = 0;
 
@@ -158,6 +180,11 @@ static int torrent_session_torrent_handles(lua_State *L) {
     return 1;
 }
 
+/*
+ * status = session:status()
+ *
+ *   returns a table describing the current session 
+ */
 static int torrent_session_status(lua_State *L) {
     void* ud = 0;
 
@@ -182,6 +209,12 @@ static int torrent_session_status(lua_State *L) {
     return 1;
 }
 
+/*
+ * bool = session:is_listening()
+ *
+ *   returns true if the session has successfully opened a listing port,
+ *   otherwise false
+ */
 static int torrent_session_is_listening(lua_State *L) {
     void* ud = 0;
 
@@ -193,6 +226,11 @@ static int torrent_session_is_listening(lua_State *L) {
     return 1;
 }
 
+/*
+ * port_num = session:listen_port()
+ *
+ *   returns the current listening port
+ */
 static int torrent_session_listen_port(lua_State *L) {
     void* ud = 0;
 
@@ -204,6 +242,11 @@ static int torrent_session_listen_port(lua_State *L) {
     return 1;
 }
 
+/*
+ * count = session:num_uploads()
+ *
+ *   returns the number of currently unchoked peers 
+ */
 static int torrent_session_num_uploads(lua_State *L) {
     void* ud = 0;
 
@@ -215,6 +258,11 @@ static int torrent_session_num_uploads(lua_State *L) {
     return 1;
 }
 
+/*
+ * count = session:num_connections()
+ *
+ *   returns the number of connections, including half-open ones
+ */
 static int torrent_session_num_connections(lua_State *L) {
     void* ud = 0;
 
@@ -226,6 +274,11 @@ static int torrent_session_num_connections(lua_State *L) {
     return 1;
 }
 
+/*
+ * session:remove_torrent(torrent_handle)
+ *
+ *   removes the torrent in by torrent_handle from the session
+ */
 static int torrent_session_remove_torrent(lua_State *L) {
     void* ud = 0;
 
@@ -245,6 +298,11 @@ static int torrent_session_remove_torrent(lua_State *L) {
     return 0;
 }
 
+/*
+ * bytes_per_second = session:upload_rate_limit()
+ *
+ *   returns the current session upload rate limit
+ */
 static int torrent_session_upload_rate_limit(lua_State *L) {
     void* ud = 0;
 
@@ -257,6 +315,11 @@ static int torrent_session_upload_rate_limit(lua_State *L) {
     return 1;
 }
 
+/*
+ * bytes_per_second = session:download_rate_limit()
+ *
+ *   returns the current session download rate limit
+ */
 static int torrent_session_download_rate_limit(lua_State *L) {
     void* ud = 0;
 
@@ -270,96 +333,134 @@ static int torrent_session_download_rate_limit(lua_State *L) {
     return 1;
 }
 
+/*
+ * session:set_upload_rate_limit(bytes_per_second)
+ *
+ *   sets the maximum number of bytes allowed to be sent to peers per second
+ */
 static int torrent_session_set_upload_rate_limit(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
     session *s = *((session **)ud);
 
-    int bytes_per_second = (int)lua_tonumber(L, 2);
+    int bytes_per_second = luaL_checkinteger(L, 2);
     s->set_upload_rate_limit(bytes_per_second);
 
     return 0;
 }
 
+/*
+ * session:set_download_rate_limit(bytes_per_second)
+ *
+ *   sets the maximum number of bytes allowed to be downloaded from peers per second
+ */
 static int torrent_session_set_download_rate_limit(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
     session *s = *((session **)ud);
 
-    int bytes_per_second = (int)lua_tonumber(L, 2);
+    int bytes_per_second = luaL_checkinteger(L, 2);
     s->set_download_rate_limit(bytes_per_second);
 
     return 0;
 }
 
+/*
+ * session:set_max_uploads(max)
+ *
+ *   sets a limit on the number of unchoked peers (uploads)
+ *   for this session
+ */
 static int torrent_session_set_max_uploads(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
     session *s = *((session **)ud);
 
-    int limit = (int)lua_tonumber(L, 2);
+    int limit = luaL_checkinteger(L, 2);
     s->set_max_uploads(limit);
 
     return 0;
 }
 
+/*
+ * session:set_max_connections(max)
+ *
+ *   sets the maximum number of connections this session will 
+ *   have when connecting to peers
+ */
 static int torrent_session_set_max_connections(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
     session *s = *((session **)ud);
 
-    int limit = (int)lua_tonumber(L, 2);
+    int limit = luaL_checkinteger(L, 2);
     s->set_max_connections(limit);
 
     return 0;
 }
 
+/*
+ * session:set_max_half_open_connections(max)
+ *
+ *   sets the maximum number of half-open connections this session will 
+ *   have when connecting to peers
+ */
 static int torrent_session_set_max_half_open_connections(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
     session *s = *((session **)ud);
 
-    int limit = (int)lua_tonumber(L, 2);
+    int limit = luaL_checkinteger(L, 2);
     s->set_max_half_open_connections(limit);
 
     return 0;
 }
 
+/*
+ * session:set_key(int)
+ */
 static int torrent_session_set_key(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
     session *s = *((session **)ud);
 
-    int key = (int)lua_tonumber(L, 2);
+    int key = luaL_checkinteger(L, 2);
     s->set_key(key);
 
     return 0;
 }
 
+/*
+ * success = session:listen_on(first_port, last_port)
+ *
+ *   changes the current listening port range to first_port to last_port
+ */
 static int torrent_session_listen_on(lua_State *L) {
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
     session *s = *((session **)ud);
 
-    int start = (int)lua_tonumber(L, 2);
-    int end = (int)lua_tonumber(L, 2);
+    int start = luaL_checkinteger(L, 2);
+    int end = luaL_checkinteger(L, 2);
 
     lua_pushboolean(L, s->listen_on(std::make_pair(start, end)));
 
     return 1;
 }
 
-
+/*
+ * __gc
+ *
+ *   frees session on GC
+ */
 static int torrent_session_gc(lua_State *L) {
-    //std::cout << "Free Session" << "\n";
-
     void* ud = 0;
 
     ud = luaL_checkudata(L, 1, "Torrent.Session");
