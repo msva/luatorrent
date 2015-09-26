@@ -1,0 +1,1 @@
+LuaTorrent is a bittorrent client library for Lua. It uses libtorrent (http://www.libtorrent.org/) as a basis.
